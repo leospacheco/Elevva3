@@ -174,7 +174,8 @@ export default function ChatChamadoPage() {
 
                     // Supabase Realtime não traz o JOIN, então buscamos o nome do remetente
                     supabase.from('profiles').select('nome, email').eq('id', novaMsg.remetente_id).single()
-                        .then(({ data: remetenteProfile }) => {
+                        .then(({ data }: { data: { nome: string | null; email: string; } | null }) => {
+                            const remetenteProfile = data;
                             const mensagemComProfile: MensagemComProfile = {
                                 ...novaMsg,
                                 // Mapeia o resultado do select para a prop remetente
