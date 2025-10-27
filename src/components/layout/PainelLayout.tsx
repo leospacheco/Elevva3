@@ -132,9 +132,9 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
                         <Image 
                             src="/images/logo-elevva.jpg" 
                             alt="Logo Elevva Web" 
-                            width={160} 
-                            height={50} 
-                            className="h-8 w-auto object-contain"
+                            width={180} 
+                            height={60} 
+                            className="h-12 w-auto object-contain"
                         />
                          <button onClick={() => setIsSidebarOpen(false)} className="text-white hover:text-gray-300">
                             <X size={24} />
