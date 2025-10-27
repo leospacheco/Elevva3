@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // VERIFICAÇÃO CRÍTICA DE AMBIENTE:
     // Garante que o .env.local foi carregado corretamente com chaves públicas.
     const hasSupabaseKeys = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
+
     // Se as chaves estiverem ausentes, paramos a execução para evitar o erro SupabaseKey is required.
     if (!hasSupabaseKeys) {
         if (typeof window !== 'undefined') { // Apenas no lado do cliente
@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 } else {
                     setProfile(null);
                 }
-                setIsLoading(false);
+                setIsLoading(false); // Define como false em qualquer mudança (incluindo logout)
             }
         );
 
@@ -92,9 +92,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
             if (currentUser) {
-                fetchUserProfile(currentUser.id).finally(() => setIsLoading(false));
+                // CORREÇÃO: Usar .then().catch().finally() para garantir que o isLoading seja false
+                fetchUserProfile(currentUser.id)
+                    .catch(error => {
+                        console.error("Erro ao buscar perfil inicial:", error);
+                        toast.error("Erro ao carregar perfil. Tente recarregar a página.");
+                    })
+                    .finally(() => setIsLoading(false)); // Garante que o loading para, mesmo com erro
             } else {
-                setIsLoading(false);
+                setIsLoading(false); // Define como false se não houver sessão
             }
         });
 
@@ -103,7 +109,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             authListener.subscription.unsubscribe();
         };
     }, []);
-
     const signOut = async () => {
         setIsLoading(true);
         await supabase.auth.signOut();
