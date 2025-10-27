@@ -61,6 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (error) {
             console.error('Erro ao buscar perfil:', error);
+            // CORREÇÃO: Lançar um erro se o perfil não for encontrado/buscado
+            // Isso garante que o .catch() no useEffect seja acionado.
+            throw new Error(error.message);
         }
         setProfile(data as Profile);
     };
@@ -73,6 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         // 1. Monitora mudanças na sessão de autenticação
+        // Esta parte já garante que isLoading seja false em mudanças de estado (login/logout)
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 const currentUser = session?.user ?? null;
@@ -83,32 +87,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 } else {
                     setProfile(null);
                 }
-                setIsLoading(false); // Define como false em qualquer mudança (incluindo logout)
+                setIsLoading(false);
             }
         );
 
-        // 2. Tenta obter a sessão inicial
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
-            if (currentUser) {
-                // CORREÇÃO: Usar .then().catch().finally() para garantir que o isLoading seja false
-                fetchUserProfile(currentUser.id)
-                    .catch(error => {
-                        console.error("Erro ao buscar perfil inicial:", error);
-                        toast.error("Erro ao carregar perfil. Tente recarregar a página.");
-                    })
-                    .finally(() => setIsLoading(false)); // Garante que o loading para, mesmo com erro
-            } else {
-                setIsLoading(false); // Define como false se não houver sessão
-            }
-        });
+        // 2. Tenta obter a sessão inicial (CORREÇÃO APLICADA AQUI)
+        const loadInitialSession = async () => {
+            try {
+                // Tenta obter a sessão e buscar o perfil
+                const { data: { session } } = await supabase.auth.getSession();
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
 
+                if (currentUser) {
+                    await fetchUserProfile(currentUser.id);
+                } else {
+                    setProfile(null);
+                }
+            } catch (error) {
+                // Captura qualquer erro de rede ou de RLS (se fetchUserProfile falhar)
+                console.error("Erro durante a carga inicial da sessão/perfil:", error);
+                toast.error("Erro crítico ao carregar dados. Tente recarregar.");
+            } finally {
+                // ISTO É A CORREÇÃO PRINCIPAL: Garante que o estado de loading seja desligado, 
+                // mesmo em caso de erro ou se a sessão estiver nula.
+                setIsLoading(false);
+            }
+        };
+
+        loadInitialSession();
 
         return () => {
             authListener.subscription.unsubscribe();
         };
     }, []);
+
     const signOut = async () => {
         setIsLoading(true);
         await supabase.auth.signOut();
