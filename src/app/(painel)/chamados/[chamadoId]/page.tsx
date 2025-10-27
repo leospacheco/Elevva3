@@ -104,15 +104,39 @@ export default function ChatChamadoPage() {
         const contentToSend = novaMensagem.trim();
         setNovaMensagem(''); // Limpa imediatamente
 
-        const { error } = await supabase.from('mensagens').insert({
+        // CORREÇÃO: Adicionar .select().single() para obter os dados inseridos
+        const { data: newMessageData, error } = await supabase.from('mensagens').insert({
             chamado_id: chamadoId,
             remetente_id: user.id,
             conteudo: contentToSend,
-        });
+        }).select('id, chamado_id, remetente_id, conteudo, created_at').single(); // <-- OBRIGA O RETORNO DOS DADOS INSERIDOS
 
         if (error) {
             toast.error('Erro ao enviar mensagem.');
             setNovaMensagem(contentToSend); // Reverte o estado se houver erro
+        } else if (newMessageData && chamado && profile) {
+            // 1. Cria a representação local da mensagem usando os dados retornados e o perfil do remetente
+            const localMessage: MensagemComProfile = {
+                id: newMessageData.id,
+                chamado_id: newMessageData.chamado_id,
+                remetente_id: newMessageData.remetente_id,
+                conteudo: newMessageData.conteudo,
+                created_at: newMessageData.created_at,
+                // O perfil do remetente é o perfil do usuário logado (Perfil Otimista)
+                remetente: {
+                    nome: profile.nome || profile.email,
+                    email: profile.email,
+                },
+            };
+
+            // 2. Adiciona ao estado imediatamente para que o usuário veja a mensagem
+            setMensagens((prev: MensagemComProfile[]) => [...prev, localMessage]); // <-- CORREÇÃO AQUI
+            toast.success('Mensagem enviada!');
+            // Rola imediatamente (com pequeno delay para renderização)
+            setTimeout(scrollToBottom, 50);
+
+            // Nota: O listener Realtime ainda garantirá que outros clientes recebam a mensagem.
+            // Para o cliente que enviou, esta atualização imediata resolve o problema de atraso.
         }
     };
 
@@ -225,8 +249,8 @@ export default function ChatChamadoPage() {
                                 onClick={() => handleStatusChange(statusKey)}
                                 disabled={isActive}
                                 className={`px-4 py-2 text-sm rounded-full font-medium transition ${isActive
-                                        ? `${details.color} text-white border-2 border-opacity-70`
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    ? `${details.color} text-white border-2 border-opacity-70`
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                     }`}
                             >
                                 {details.label}
@@ -246,8 +270,8 @@ export default function ChatChamadoPage() {
                         return (
                             <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[70%] p-3 rounded-lg shadow-md ${isMine
-                                        ? 'bg-blue-600 text-white rounded-br-none'
-                                        : 'bg-gray-700 text-white rounded-tl-none'
+                                    ? 'bg-blue-600 text-white rounded-br-none'
+                                    : 'bg-gray-700 text-white rounded-tl-none'
                                     }`}>
                                     <p className="text-xs font-semibold mb-1 opacity-80">
                                         {senderName}
@@ -282,8 +306,8 @@ export default function ChatChamadoPage() {
                             type="submit"
                             disabled={!user || novaMensagem.trim() === ''}
                             className={`p-3 rounded-lg transition ${!user || novaMensagem.trim() === ''
-                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
                                 }`}
                         >
                             <Send size={24} />

@@ -5,7 +5,7 @@ import { MessageCircle, X } from 'lucide-react';
 import { useState } from 'react';
 
 // Seu número com código do país (ex: 5541999999999)
-const WHATSAPP_NUMBER = '5511999999999'; 
+const WHATSAPP_NUMBER = '5541920001320'; 
 const MESSAGE = 'Olá! Gostaria de um orçamento para a criação de um site para minha empresa. Meu nome é...';
 
 export const WhatsAppButton: React.FC = () => {
