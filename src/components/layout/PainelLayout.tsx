@@ -1,3 +1,4 @@
+
 // src/components/layout/PainelLayout.tsx
 'use client';
 
@@ -131,7 +132,7 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
                 >
                     <div className="flex justify-between items-center p-2 mb-6 border-b border-gray-700 pb-4">
                         <Image
-                            src="/images/logo-elevva.jpg"
+                            src="/images/logo-elevva.png"
                             alt="Logo Elevva Web"
                             width={180}
                             height={60}
