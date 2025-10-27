@@ -210,7 +210,7 @@ export default function LandingPage() {
             {/* 5. Footer */}
             <footer className="py-8 text-center text-gray-500 text-sm border-t border-gray-800">
                 <p>Elevva Web - Desenvolvendo soluções para o seu futuro digital.</p>
-                <p className="mt-2">Contato: [contato@elevvaweb.com] | Telefone: [(41)92000-1320]</p>
+                <p className="mt-2">Contato: contato@elevvaweb.com | Telefone: (41)92000-1320</p>
                 <p>&copy; {new Date().getFullYear()} Elevva Web. Todos os direitos reservados.</p>
             </footer>
 
