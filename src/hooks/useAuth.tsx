@@ -68,49 +68,74 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     useEffect(() => {
-        let isMounted = true; // Flag para evitar atualização de estado após desmontagem
+        let isMounted = true;
 
-        // 1. O onAuthStateChange é a ÚNICA fonte de verdade. Ele dispara imediatamente.
+        // 1. ROTINA DE CARGA INICIAL (F5, Troca de Aba, etc.):
+        const loadInitialSession = async () => {
+            // Garante que só roda se o componente estiver montado e for a primeira vez
+            if (!isMounted || !initialLoadRef.current) return;
+
+            try {
+                // Tenta obter a sessão (Supabase lê do cache/cookies)
+                const { data: { session } } = await supabase.auth.getSession();
+
+                const currentUser = session?.user ?? null;
+                setUser(currentUser);
+
+                // Se há usuário, busca o perfil.
+                if (currentUser) {
+                    await fetchUserProfile(currentUser.id);
+                } else {
+                    setProfile(null);
+                }
+            } catch (error) {
+                // Captura erros (ex: rede, falha de RLS)
+                console.error("Erro durante a carga inicial da sessão/perfil:", error);
+                if (isMounted) {
+                    toast.error("Erro crítico ao carregar dados de autenticação.");
+                    setUser(null);
+                    setProfile(null);
+                }
+            } finally {
+                // CORREÇÃO PRINCIPAL: DESLIGA O LOADING GARANTIDO
+                if (isMounted && initialLoadRef.current) {
+                    setIsLoading(false);
+                    initialLoadRef.current = false; // Garante que nunca mais será ativado
+                }
+            }
+        };
+
+        // 2. MONITORAMENTO DE MUDANÇA (Eventos em tempo real):
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                if (!isMounted) return;
+                // Se o loading inicial ainda não terminou, ignoramos este evento.
+                if (!isMounted || initialLoadRef.current) return;
 
                 const currentUser = session?.user ?? null;
                 setUser(currentUser);
 
                 try {
                     if (currentUser) {
-                        // Se houver usuário, tenta buscar o perfil
                         await fetchUserProfile(currentUser.id);
                     } else {
                         setProfile(null);
+                        // Redireciona se o evento for de desautenticação
+                        if (event === 'SIGNED_OUT' && router) {
+                            router.push('/login');
+                        }
                     }
                 } catch (error) {
                     console.error("Erro no onAuthStateChange ao buscar perfil:", error);
-                    // Deixa a lógica do finally desligar o loading
-                }
-
-                // CORREÇÃO DE LOADING: Se for o primeiro disparo (carga inicial), desliga o loading
-                if (initialLoadRef.current) {
-                    setIsLoading(false);
-                    initialLoadRef.current = false;
                 }
             }
         );
 
-        // CORREÇÃO DE SAFETY: Adiciona um timeout de segurança para desligar o loader 
-        // caso o evento inicial do Supabase demore demais ou falhe (o que acontece em F5/aba inativa).
-        const timeoutId = setTimeout(() => {
-            if (initialLoadRef.current && isMounted) {
-                console.warn("Timeout de carregamento. Desligando loading state de segurança.");
-                setIsLoading(false);
-                initialLoadRef.current = false;
-            }
-        }, 5000); // 5 segundos é um tempo seguro.
+        // Inicia a carga inicial (que irá desativar o isLoading)
+        loadInitialSession();
 
+        // Cleanup:
         return () => {
             isMounted = false;
-            clearTimeout(timeoutId);
             authListener.subscription.unsubscribe();
         };
     }, []); // Roda apenas na montagem
