@@ -5,7 +5,7 @@ import { CheckCircle, Zap, Shield, Layout, Settings, Rocket, DollarSign, Clock, 
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 
 // Caminhos CORRIGIDOS para os arquivos do usuário
-const LOGO_PATH = '/images/logo-elevva.jpg'; 
+const LOGO_PATH = '/images/logo-elevva.png'; 
 const PLANS_PATH = '/images/planos-elevva.jpg'; 
 
 // Card de Funcionalidade
