@@ -2,17 +2,23 @@
 import { createClient } from '@supabase/supabase-js';
 
 // --- VERIFICAÇÃO RIGOROSA ---
-// Força a leitura das variáveis de ambiente ou define como string vazia se ausente, 
-// o que permite o TypeScript e o runtime lidar com a falha de forma segura.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Se as chaves estiverem vazias, o código abaixo irá falhar, 
-// o que é esperado e será tratado pelo useAuth.tsx para evitar quebras.
-// Se as chaves NÃO forem encontradas no servidor (Next.js Server Component), a inicialização falhará aqui.
+// --- NOVO SINGLETON PARA CLIENT-SIDE ---
+// Cria uma instância global para garantir que o createClient seja chamado APENAS UMA VEZ
+const getClientSingleton = () => {
+    // Verifica se o cliente já existe no ambiente global (para persistir a instância)
+    if (!(globalThis as any).supabase) {
+        // Se não existe, cria a instância e a armazena no globalThis
+        (globalThis as any).supabase = createClient(supabaseUrl, supabaseKey);
+    }
+    return (globalThis as any).supabase;
+};
 
-// Cria uma instância do cliente Supabase para ser usada no lado do cliente (navegador)
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// Exporta o cliente único para ser usado nos componentes client-side
+export const supabase = getClientSingleton();
+
 
 // Cria uma instância para uso em ambientes de servidor (API Routes ou Server Components)
 const serviceRoleKey = process.env.SUPABASE_SERVICE_KEY || '';
