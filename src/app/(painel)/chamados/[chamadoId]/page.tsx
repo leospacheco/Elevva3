@@ -168,14 +168,13 @@ export default function ChatChamadoPage() {
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'mensagens', filter: `chamado_id=eq.${chamadoId}` },
-                (payload: any) => {
+                (payload) => {
                     // A nova mensagem vem no payload.new
                     const novaMsg: Mensagem = payload.new as Mensagem;
 
                     // Supabase Realtime não traz o JOIN, então buscamos o nome do remetente
                     supabase.from('profiles').select('nome, email').eq('id', novaMsg.remetente_id).single()
-                        .then(({ data }: { data: { nome: string | null; email: string; } | null }) => {
-                            const remetenteProfile = data;
+                        .then(({ data: remetenteProfile }) => {
                             const mensagemComProfile: MensagemComProfile = {
                                 ...novaMsg,
                                 // Mapeia o resultado do select para a prop remetente
