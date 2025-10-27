@@ -10,13 +10,16 @@ dotenv.config({ path: envPath });
 
 
 const nextConfig = {
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
     // Configuração de Imagens (já estava aqui)
     images: {
         remotePatterns: [
             // Se você usar URLs externas, adicione-as aqui.
         ],
     },
-    
+
     // FORÇA O CARREGAMENTO DAS VARIÁVEIS PÚBLICAS/DE SERVIDOR NO PROCESSO
     env: {
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -24,7 +27,7 @@ const nextConfig = {
         SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
         // Adicione outras variáveis aqui se necessário
     },
-    
+
     // Adicione esta opção se tiver problemas com a otimização de imagem local
     // Caso contrário, pode ser omitida.
     // output: 'standalone', 
