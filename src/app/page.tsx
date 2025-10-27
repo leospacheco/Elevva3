@@ -85,9 +85,9 @@ export default function LandingPage() {
                     <Image 
                         src={LOGO_PATH} 
                         alt="Logo Elevva Web" 
-                        width={180} 
-                        height={60} 
-                        className="h-12 w-auto object-contain"
+                        width={240} 
+                        height={80} 
+                        className="h-16 w-auto object-contain"
                         priority
                     />
                 </Link>
