@@ -3,7 +3,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useContext, createContext, ReactNode } from 'react';
+import { useEffect, useState, useContext, createContext, ReactNode, useRef } from 'react';
 import { Profile } from '@/types/app';
 import { User } from '@supabase/supabase-js';
 import toast from 'react-hot-toast'; // Adicionado para feedback visual
