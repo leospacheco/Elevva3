@@ -75,52 +75,72 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     useEffect(() => {
-        // 1. Monitora mudanças na sessão de autenticação
-        // Esta parte já garante que isLoading seja false em mudanças de estado (login/logout)
+        let isMounted = true; // Flag para garantir que o estado só é atualizado se o componente estiver montado.
+
+        // 1. Configura o monitoramento de mudanças de estado (para eventos em tempo real, como logout)
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                if (!isMounted) return;
+
                 const currentUser = session?.user ?? null;
                 setUser(currentUser);
 
+                // Se houver usuário, busca o perfil.
                 if (currentUser) {
                     await fetchUserProfile(currentUser.id);
                 } else {
+                    // Se for um evento de LOGOUT ou sessão nula, limpa e desliga o loading.
                     setProfile(null);
                 }
-                setIsLoading(false);
+                // Definir o loading para false em qualquer evento AUTH_STATE_CHANGE é crucial,
+                // mas a rotina loadInitialSession lida com a primeira vez.
             }
         );
 
-        // 2. Tenta obter a sessão inicial (CORREÇÃO APLICADA AQUI)
+        // 2. Rotina de Carga Inicial Atômica (Executada apenas no mount)
         const loadInitialSession = async () => {
             try {
-                // Tenta obter a sessão e buscar o perfil
+                // Tenta obter a sessão no cache
                 const { data: { session } } = await supabase.auth.getSession();
+
+                if (!isMounted) return; // Checa antes de prosseguir
+
                 const currentUser = session?.user ?? null;
                 setUser(currentUser);
 
+                // Se houver usuário, busca o perfil.
                 if (currentUser) {
+                    // Espera a busca do perfil para definir o estado.
                     await fetchUserProfile(currentUser.id);
                 } else {
                     setProfile(null);
                 }
             } catch (error) {
-                // Captura qualquer erro de rede ou de RLS (se fetchUserProfile falhar)
+                // Captura qualquer erro de rede, timeout, ou erro no fetchUserProfile
                 console.error("Erro durante a carga inicial da sessão/perfil:", error);
-                toast.error("Erro crítico ao carregar dados. Tente recarregar.");
+                if (isMounted) {
+                    toast.error("Erro crítico ao carregar dados. Tente recarregar.");
+                    setUser(null);
+                    setProfile(null);
+                }
             } finally {
-                // ISTO É A CORREÇÃO PRINCIPAL: Garante que o estado de loading seja desligado, 
-                // mesmo em caso de erro ou se a sessão estiver nula.
-                setIsLoading(false);
+                // CORREÇÃO PRINCIPAL: Garante que o estado de loading seja desligado, 
+                // independentemente do resultado.
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
         };
 
+        // Inicia a rotina
         loadInitialSession();
 
+        // Cleanup: Garante que o listener seja removido e o flag desativado na desmontagem
         return () => {
+            isMounted = false;
             authListener.subscription.unsubscribe();
         };
-    }, []);
+    }, []); // Roda apenas na montagem
 
     const signOut = async () => {
         setIsLoading(true);
