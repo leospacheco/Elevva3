@@ -67,9 +67,9 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
                     <Image 
                         src="/images/logo-elevva.png" 
                         alt="Logo Elevva Web" 
-                        width={200} 
-                        height={60} 
-                        className="h-12 w-auto object-contain"
+                        width={240} 
+                        height={80} 
+                        className="h-16 w-auto object-contain"
                     />
                 </div>
                 
