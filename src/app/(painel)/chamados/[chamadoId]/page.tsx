@@ -168,7 +168,7 @@ export default function ChatChamadoPage() {
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'mensagens', filter: `chamado_id=eq.${chamadoId}` },
-                (payload) => {
+                (payload: any) => {
                     // A nova mensagem vem no payload.new
                     const novaMsg: Mensagem = payload.new as Mensagem;
 
