@@ -91,7 +91,7 @@ export default function LandingPage() {
                         priority
                     />
                 </Link>
-                <div className="space-x-4">
+                <div className="flex space-x-2 sm:space-x-4 flex-shrink-0">
                     <Link href="/login" className="text-gray-300 hover:text-white transition py-2 px-4">
                         Acessar Painel
                     </Link>
