@@ -12,8 +12,9 @@ import { usePathname } from 'next/navigation';
 // Componente de navegação (Item da sidebar)
 const NavItem = ({ href, icon: Icon, label, isActive }: { href: string, icon: React.ElementType, label: string, isActive: boolean }) => (
     <Link href={href} className={`flex items-center p-3 rounded-lg transition duration-150 ${
-        isActive ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-    }`}>
+        // Substituindo blue-600 pela cor primária da Elevva
+        isActive ? 'bg-elevva-primary text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+        }`}>
         <Icon size={20} className="mr-3" />
         <span className="font-medium">{label}</span>
     </Link>
@@ -33,7 +34,7 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
             </div>
         );
     }
-    
+
     // Se o profile for null aqui, o middleware deve ter redirecionado para /login
 
     const roleName = profile?.role === 2 ? 'Administrador' : profile?.role === 1 ? 'Funcionário' : 'Cliente';
@@ -53,9 +54,9 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
         { href: '/chamados', icon: MessageSquare, label: 'Gerenciar Chamados' },
         { href: '/orcamentos', icon: DollarSign, label: 'Gerenciar Orçamentos' },
         { href: '/servicos', icon: Briefcase, label: 'Gerenciar Serviços' },
-        
+
     ];
-    
+
     // Rotas do Admin/Employee serão acessadas através de /dashboard. Redirecionamento lógico já está no dashboard.
     const navItems = isEmployee ? employeeNavItems : clientNavItems;
 
@@ -64,18 +65,18 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
             {/* Sidebar (Desktop) */}
             <aside className={`w-64 bg-gray-800 border-r border-gray-700 p-4 hidden md:flex flex-col flex-shrink-0`}>
                 <div className="flex items-center justify-center p-2 mb-6">
-                    <Image 
-                        src="/images/logo-elevva.png" 
-                        alt="Logo Elevva Web" 
-                        width={240} 
-                        height={80} 
+                    <Image
+                        src="/images/logo-elevva.png"
+                        alt="Logo Elevva Web"
+                        width={240}
+                        height={80}
                         className="h-16 w-auto object-contain"
                     />
                 </div>
-                
+
                 <nav className="flex-grow space-y-1">
                     {navItems.map(item => (
-                        <NavItem 
+                        <NavItem
                             key={item.href}
                             href={item.href}
                             icon={item.icon}
@@ -90,7 +91,7 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
                 <div className="pt-4 border-t border-gray-700 mt-auto">
                     <div className="text-sm text-gray-400 mb-2">
                         <p className="font-bold text-white truncate">{profile?.nome || profile?.email}</p>
-                        <p className="text-blue-400">{roleName}</p>
+                        <p className="text-elevva-secondary">{roleName}</p> {/* <-- Usando verde/ciano para a Role */}
                     </div>
                     <button
                         onClick={signOut}
@@ -120,30 +121,30 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
             </main>
 
             {/* Sidebar Mobile (Modal) */}
-            <div 
+            <div
                 className={`fixed inset-0 z-40 bg-black bg-opacity-75 md:hidden transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setIsSidebarOpen(false)}
             >
-                <aside 
+                <aside
                     className={`w-64 bg-gray-800 h-full p-4 flex flex-col transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex justify-between items-center p-2 mb-6 border-b border-gray-700 pb-4">
-                        <Image 
-                            src="/images/logo-elevva.jpg" 
-                            alt="Logo Elevva Web" 
-                            width={180} 
-                            height={60} 
+                        <Image
+                            src="/images/logo-elevva.jpg"
+                            alt="Logo Elevva Web"
+                            width={180}
+                            height={60}
                             className="h-12 w-auto object-contain"
                         />
-                         <button onClick={() => setIsSidebarOpen(false)} className="text-white hover:text-gray-300">
+                        <button onClick={() => setIsSidebarOpen(false)} className="text-white hover:text-gray-300">
                             <X size={24} />
                         </button>
                     </div>
-                    
+
                     <nav className="flex-grow space-y-1">
                         {navItems.map(item => (
-                            <NavItem 
+                            <NavItem
                                 key={item.href}
                                 href={item.href}
                                 icon={item.icon}

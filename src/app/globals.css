@@ -9,5 +9,6 @@ body {
 
 /* Estilos para links no corpo */
 a {
-  @apply text-blue-400 hover:text-blue-300 transition-colors duration-150;
+  /* Substituindo blue-400/300 pelas cores primárias da Elevva (tailwind.config.js) */
+  @apply text-elevva-primary hover:text-elevva-primary/80 transition-colors duration-150;
 }

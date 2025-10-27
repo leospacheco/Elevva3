@@ -5,7 +5,7 @@ import { PainelLayout } from '@/components/layout/PainelLayout';
 import { useAuth } from '@/hooks/useAuth';
 // IMPORTAÇÕES CORRIGIDAS: useState e Link adicionados, useQuery removido
 import React, { useState } from 'react';
-import Link from 'next/link'; 
+import Link from 'next/link';
 import { Briefcase, DollarSign, MessageSquare, CheckCircle, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 // import { Chamado, Orcamento, Servico } from '@/types/app'; // Tipos não usados diretamente aqui
@@ -55,7 +55,7 @@ const fetchClientData = async (userId: string) => {
 export default function DashboardPage() {
     // Hooks usados no topo
     const { profile, isEmployee, isClient, isLoading } = useAuth();
-    
+
     // Simulação de hook de busca de dados (Usamos useState por simplicidade)
     const [stats, setStats] = useState({ chamadosAbertos: 0, orcamentosPendentes: 0, servicosAndamento: 0 });
 
@@ -85,7 +85,7 @@ export default function DashboardPage() {
             </PainelLayout>
         );
     }
-    
+
     // --- PAINEL DO CLIENTE (Role 0) ---
     return (
         <PainelLayout>
@@ -94,36 +94,39 @@ export default function DashboardPage() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <StatsCard 
-                    title="Chamados Abertos" 
-                    value={stats.chamadosAbertos} 
-                    icon={MessageSquare} 
-                    colorClass="text-red-400"
+                <StatsCard
+                    title="Chamados Abertos"
+                    value={stats.chamadosAbertos}
+                    icon={MessageSquare}
+                    colorClass="text-red-400" // Manter cor de alerta
                 />
-                <StatsCard 
-                    title="Orçamentos Pendentes" 
-                    value={stats.orcamentosPendentes} 
-                    icon={DollarSign} 
-                    colorClass="text-yellow-400"
+                <StatsCard
+                    title="Orçamentos Pendentes"
+                    value={stats.orcamentosPendentes}
+                    icon={DollarSign}
+                    colorClass="text-yellow-400" // Manter cor de aviso
                 />
-                <StatsCard 
-                    title="Serviços em Andamento" 
-                    value={stats.servicosAndamento} 
-                    icon={Briefcase} 
-                    colorClass="text-blue-400"
+                <StatsCard
+                    title="Serviços em Andamento"
+                    value={stats.servicosAndamento}
+                    icon={Briefcase}
+                    colorClass="text-elevva-primary" // <-- Usar a cor primária da Elevva
                 />
             </div>
 
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
                 <h2 className="text-xl font-bold text-white mb-4">Ações Rápidas</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Link href="/chamados/novo" className="bg-blue-600 p-4 rounded-lg text-white font-semibold hover:bg-blue-700 transition flex items-center justify-center">
+                    {/* Blue-600 -> Elevva Primary */}
+                    <Link href="/chamados/novo" className="bg-elevva-primary p-4 rounded-lg text-white font-semibold hover:bg-elevva-primary/80 transition flex items-center justify-center">
                         <Clock size={20} className="mr-2" /> Abrir Novo Chamado
                     </Link>
+                    {/* Yellow-600 -> Mantido, é uma cor de aviso */}
                     <Link href="/orcamentos" className="bg-yellow-600 p-4 rounded-lg text-white font-semibold hover:bg-yellow-700 transition flex items-center justify-center">
                         <DollarSign size={20} className="mr-2" /> Meus Orçamentos
                     </Link>
-                    <Link href="/servicos" className="bg-green-600 p-4 rounded-lg text-white font-semibold hover:bg-green-700 transition flex items-center justify-center">
+                    {/* Green-600 -> Elevva Secondary (Verde/Ciano) */}
+                    <Link href="/servicos" className="bg-elevva-secondary p-4 rounded-lg text-white font-semibold hover:bg-elevva-secondary/80 transition flex items-center justify-center">
                         <CheckCircle size={20} className="mr-2" /> Status dos Projetos
                     </Link>
                 </div>
