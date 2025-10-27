@@ -65,7 +65,7 @@ export const PainelLayout: React.FC<{ children: ReactNode }> = ({ children }) =>
             <aside className={`w-64 bg-gray-800 border-r border-gray-700 p-4 hidden md:flex flex-col flex-shrink-0`}>
                 <div className="flex items-center justify-center p-2 mb-6">
                     <Image 
-                        src="/images/logo-elevva.jpg" 
+                        src="/images/logo-elevva.png" 
                         alt="Logo Elevva Web" 
                         width={150} 
                         height={50} 
