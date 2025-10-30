@@ -33,7 +33,7 @@ export default function RegisterPage() {
         } else if (user) {
             toast.success('Conta criada com sucesso! Verifique seu email para confirmar o cadastro.');
             // Após o registro, o usuário precisa confirmar o e-mail (Supabase padrão)
-            router.push('/login?message=check_email'); 
+            router.push('/login'); 
         }
         setLoading(false);
     };
