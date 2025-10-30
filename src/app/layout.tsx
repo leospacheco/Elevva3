@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: 'Elevva Web | Soluções Digitais Profissionais',
   description: 'Desenvolvimento de sites e web apps modernos com Next.js, TypeScript e Supabase.',
+  icons: {
+    icon: '/favicon.ico', // Caminho absoluto para o arquivo na raiz
+  },
 };
 
 export default function RootLayout({
