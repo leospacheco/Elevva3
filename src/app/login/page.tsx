@@ -3,8 +3,8 @@
 
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
@@ -13,6 +13,16 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        if (searchParams.get('message') === 'check_email') {
+            toast.success('Cadastro realizado! Por favor, **confirme seu email** para ativar sua conta e fazer login. (Verifique sua caixa de spam).', {
+                duration: 8000, // Exibe por mais tempo
+            });
+            // Opcional: Remover o parâmetro da URL após exibir a mensagem
+            router.replace('/login', undefined);
+        }
+    }, [searchParams, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -77,11 +87,10 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full flex justify-center items-center py-2 px-4 rounded-md text-lg font-bold transition ${
-                            loading 
-                                ? 'bg-gray-500 text-gray-300 cursor-not-allowed' 
+                        className={`w-full flex justify-center items-center py-2 px-4 rounded-md text-lg font-bold transition ${loading
+                                ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
+                            }`}
                     >
                         {loading ? <Loader2 className="animate-spin mr-2" size={24} /> : 'Entrar'}
                     </button>
