@@ -11,7 +11,7 @@ export const metadata = {
   title: 'Elevva Web | Soluções Digitais Profissionais',
   description: 'Desenvolvimento de sites e web apps modernos com Next.js, TypeScript e Supabase.',
   icons: {
-    icon: '/favicon.ico', // Caminho absoluto para o arquivo na raiz
+    icon: '/favicon.ico?v=1', // Caminho absoluto para o arquivo na raiz
   },
 };
 
